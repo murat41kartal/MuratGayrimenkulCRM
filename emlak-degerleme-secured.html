@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murat Öge Gayrimenkul — Emlak Değerleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#e8e0d0;min-height:100vh}
+.header{text-align:center;padding:40px 20px 20px;border-bottom:1px solid #2a2a2a}
+.badge{display:inline-block;border:1px solid #8b6914;color:#c9a227;font-size:11px;letter-spacing:3px;padding:6px 16px;margin-bottom:20px;text-transform:uppercase}
+.header h1{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,42px);font-weight:600;line-height:1.2;color:#fff}
+.header p{color:#888;margin-top:8px;font-size:14px}
+.container{max-width:800px;margin:0 auto;padding:30px 20px}
+.section{background:#141414;border:1px solid #222;border-radius:12px;padding:28px;margin-bottom:20px}
+.section-title{font-family:'Playfair Display',serif;font-size:16px;color:#c9a227;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #2a2a2a}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#888}
+.form-group input,.form-group select,.form-group textarea{background:#1e1e1e;border:1px solid #333;color:#e8e0d0;padding:12px 14px;border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#c9a227}
+.tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.tab{padding:10px 20px;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:13px;background:transparent;color:#888;transition:all .2s}
+.tab.active{background:#c9a227;border-color:#c9a227;color:#000;font-weight:500}
+.tab-content{display:none}.tab-content.active{display:block}
+.price-input-row{display:flex;gap:8px;align-items:center}
+.price-input-row input{flex:1;font-size:16px;padding:14px}
+.add-btn{background:#c9a227;border:none;color:#000;width:48px;height:48px;border-radius:8px;font-size:24px;cursor:pointer;font-weight:bold;flex-shrink:0}
+.price-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.price-tag{background:#1e1e1e;border:1px solid #c9a227;color:#c9a227;padding:8px 14px;border-radius:20px;font-size:14px;display:flex;align-items:center;gap:8px}
+.price-tag button{background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1}
+.price-summary{font-size:14px;color:#888;margin-top:10px}
+.price-summary span{color:#c9a227;font-weight:600}
+.submit-btn{width:100%;padding:18px;background:linear-gradient(135deg,#c9a227,#8b6914);border:none;color:#000;font-size:16px;font-weight:600;border-radius:10px;cursor:pointer;margin-top:10px;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.submit-btn:hover{opacity:.9}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.error-box{background:#1a0a0a;border:1px solid #5a1a1a;color:#ff6b6b;padding:16px;border-radius:8px;margin-top:10px;font-size:14px;display:none}
+.loading{text-align:center;padding:20px;color:#c9a227;display:none;font-size:15px}
+.bolge-toggle{background:none;border:1px solid #444;color:#888;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;float:right;margin-top:-6px}
+.bolge-toggle:hover{border-color:#c9a227;color:#c9a227}
+.bolge-panel{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #222}
+.bolge-row{display:flex;gap:8px;margin-bottom:8px}
+.bolge-row input{flex:1;background:#1e1e1e;border:1px solid #333;color:#e8e0d0;padding:8px 10px;border-radius:6px;font-size:13px;font-family:"DM Sans",sans-serif}
+.bolge-row input:focus{outline:none;border-color:#c9a227}
+.bolge-add{background:#c9a227;border:none;color:#000;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.bolge-list{margin-top:8px}
+.bolge-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#1a1a1a;border-radius:6px;margin-bottom:4px;font-size:13px}
+.bolge-item span{color:#c9a227;font-weight:600}
+.bolge-item button{background:none;border:none;color:#555;cursor:pointer;font-size:16px}
+.m2-hint{font-size:12px;color:#c9a227;margin-top:6px;display:none;padding:6px 10px;background:#1a1a0a;border-radius:6px}
+.result-page{display:none;background:#f5f5f0;color:#1a1a1a;min-height:100vh}
+.result-header{background:#1a1a1a;color:#fff;padding:30px;text-align:center}
+.result-header h1{font-family:'Playfair Display',serif;font-size:28px}
+.result-header p{color:#888;margin-top:5px;font-size:14px}
+.result-body{max-width:800px;margin:0 auto;padding:30px 20px}
+.price-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:600px){.price-cards{grid-template-columns:1fr}}
+.price-card{background:#fff;border-radius:12px;padding:24px;text-align:center;border-top:4px solid #ddd;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.price-card.hizli{border-color:#3b82f6}
+.price-card.ortalama{border-color:#c9a227}
+.price-card.tok{border-color:#ef4444}
+.price-card .card-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:12px}
+.price-card .m2-price{font-size:16px;font-weight:700;margin-bottom:6px}
+.price-card.hizli .m2-price{color:#3b82f6}
+.price-card.ortalama .m2-price{color:#c9a227}
+.price-card.tok .m2-price{color:#ef4444}
+.price-card .total-price{font-size:13px;color:#555}
+.result-section{background:#fff;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.result-section h3{font-family:'Playfair Display',serif;font-size:16px;color:#1a1a1a;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee}
+.result-section p{font-size:14px;color:#444;line-height:1.7}
+.result-footer{text-align:center;padding:20px;color:#888;font-size:12px}
+.action-btns{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn-pdf{background:#1a1a1a;color:#fff;border:none;padding:14px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif}
+.btn-wa{background:#25d366;color:#fff;border:none;padding:14px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif}
+.btn-back{background:transparent;color:#888;border:1px solid #ddd;padding:14px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif}
+.kira-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.kira-item{background:#f9f9f9;border-radius:8px;padding:14px}
+.kira-item .ki-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px}
+.kira-item .ki-value{font-size:16px;font-weight:600;color:#1a1a1a;margin-top:4px}
+.ilan-info{background:#f0f7ff;border-radius:8px;padding:14px;font-size:14px;color:#1a4a8a}
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a}
+.login-box{background:#141414;border:1px solid #222;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
+.login-box h2{font-family:'Playfair Display',serif;color:#fff;margin-bottom:8px}
+.login-box p{color:#888;font-size:14px;margin-bottom:24px}
+.login-box input{width:100%;background:#1e1e1e;border:1px solid #333;color:#e8e0d0;padding:14px;border-radius:8px;font-size:15px;text-align:center;letter-spacing:2px;margin-bottom:12px}
+.login-box button{width:100%;background:#c9a227;border:none;color:#000;padding:14px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.login-error{color:#ff6b6b;font-size:13px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h2>🏠 Murat Öge</h2>
+    <p>Gayrimenkul Değerleme Sistemi</p>
+    <input type="password" id="passInput" placeholder="Şifre" onkeydown="if(event.key==='Enter')checkPass()">
+    <button onclick="checkPass()">Giriş Yap</button>
+    <div class="login-error" id="loginError">Hatalı şifre!</div>
+  </div>
+</div>
+
+<div id="mainPage" style="display:none">
+<div class="header">
+  <div class="badge">Ücretsiz Değerleme</div>
+  <h1>Murat Öge Gayrimenkul<br>Emlak Değerleme</h1>
+  <p>AI destekli anlık piyasa analizi</p>
+</div>
+<div class="container">
+
+  <div class="section">
+    <div class="section-title">| Değerlemeyi Yapan</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Ad Soyad</label><input type="text" id="adSoyad" value=""></div>
+      <div class="form-group"><label>Tarih</label><input type="text" id="tarih" readonly></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">| Mülk Türü</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('konut',this)">🏠 Konut</button>
+      <button class="tab" onclick="switchTab('arsa',this)">🌿 Arsa / Tarla</button>
+      <button class="tab" onclick="switchTab('ticari',this)">🏢 Ticari</button>
+    </div>
+    <div class="tab-content active" id="tab-konut">
+      <div class="form-grid">
+        <div class="form-group"><label>Konut Tipi</label><select id="konut-tip"><option value="">Seçin</option><option>Daire</option><option>Villa</option><option>Müstakil</option><option>Rezidans</option></select></div>
+        <div class="form-group"><label>Oda Sayısı</label><select id="konut-oda"><option value="">Seçin</option><option>1+1</option><option>2+1</option><option>3+1</option><option>4+1</option><option>5+1</option><option>6+1</option><option>7+1 ve üzeri</option></select></div>
+        <div class="form-group"><label>Brüt M²</label><input type="number" id="konut-brut" placeholder=""></div>
+        <div class="form-group"><label>Net M²</label><input type="number" id="konut-net" placeholder=""></div>
+        <div class="form-group"><label>Bulunduğu Kat</label><input type="number" id="konut-kat" placeholder=""></div>
+        <div class="form-group"><label>Toplam Kat</label><input type="number" id="konut-topkat" placeholder=""></div>
+        <div class="form-group"><label>Bina Yaşı</label><select id="konut-yas"><option value="">Seçin</option><option>0-2 yıl</option><option>3-5 yıl</option><option>6-10 yıl</option><option>11-20 yıl</option><option>20+ yıl</option></select></div>
+        <div class="form-group"><label>Isıtma</label><select id="konut-isitma"><option value="">Seçin</option><option>Yerden Isıtma</option><option>Doğalgaz Kombi</option><option>Merkezi</option><option>Soba</option><option>Yok</option></select></div>
+        <div class="form-group"><label>Ada No (Opsiyonel)</label><input type="text" id="konut-ada" placeholder=""></div>
+        <div class="form-group"><label>Parsel No (Opsiyonel)</label><input type="text" id="konut-parsel" placeholder=""></div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-arsa">
+      <div class="form-grid">
+        <div class="form-group"><label>Arsa Tipi</label><select id="arsa-tip"><option value="">Seçin</option><option>Arsa</option><option>Tarla</option><option>Bahçe</option><option>Zeytinlik</option></select></div>
+        <div class="form-group"><label>Alan (M²)</label><input type="text" id="arsa-alan" placeholder="" oninput="formatArsaAlan(this)"></div>
+        <div class="form-group"><label>Ada No</label><input type="text" id="arsa-ada" placeholder=""></div>
+        <div class="form-group"><label>Parsel No</label><input type="text" id="arsa-parsel" placeholder=""></div>
+        <div class="form-group"><label>İmar Durumu</label><select id="arsa-imar"><option value="">Seçin</option><option>Konut İmarlı</option><option>Ticari İmarlı</option><option>Tarım</option><option>İmarsız</option><option>Sanayi</option></select></div>
+        <div class="form-group"><label>KAKS/Emsal</label><input type="text" id="arsa-kaks" placeholder=""></div>
+      </div>
+      <div style="margin-top:12px"><a href="https://parselsorgu.tkgm.gov.tr" target="_blank" style="color:#c9a227;font-size:13px">🔗 TKGM Parsel Sorgula</a></div>
+    </div>
+    <div class="tab-content" id="tab-ticari">
+      <div class="form-grid">
+        <div class="form-group"><label>Ticari Tip</label><select id="ticari-tip"><option value="">Seçin</option><option>Dükkan</option><option>Ofis</option><option>Depo</option><option>Fabrika</option><option>Plaza</option></select></div>
+        <div class="form-group"><label>Brüt M²</label><input type="number" id="ticari-brut" placeholder=""></div>
+        <div class="form-group"><label>Bina Yaşı</label><select id="ticari-yas"><option value="">Seçin</option><option>0-5 yıl</option><option>6-15 yıl</option><option>15+ yıl</option></select></div>
+        <div class="form-group"><label>Kat</label><input type="number" id="ticari-kat" placeholder=""></div>
+        <div class="form-group"><label>Ada No (Opsiyonel)</label><input type="text" id="ticari-ada" placeholder=""></div>
+        <div class="form-group"><label>Parsel No (Opsiyonel)</label><input type="text" id="ticari-parsel" placeholder=""></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">| Konum</div>
+    <button class="bolge-toggle" onclick="bolgeToggle()">📍 Bölge m² Fiyatları</button>
+    <div class="bolge-panel" id="bolgePanel">
+      <div class="bolge-row">
+        <input type="text" id="bolgeIlce" placeholder="İlçe (ör: Derince)">
+        <input type="text" id="bolgeMahalle" placeholder="Mahalle (ör: Çınarlı)">
+        <input type="text" id="bolgeM2" placeholder="m² TL" oninput="formatBolgeM2(this)">
+        <button class="bolge-add" onclick="bolgeEkle()">+</button>
+      </div>
+      <div class="bolge-list" id="bolgeList"></div>
+    </div>
+    <div class="m2-hint" id="m2hint"></div>
+    <div class="form-grid">
+      <div class="form-group"><label>İl</label><select id="il" onchange="ilceSecildi()"><option value="">Seçin</option><option>Adana</option><option>Adıyaman</option><option>Afyonkarahisar</option><option>Ağrı</option><option>Amasya</option><option>Ankara</option><option>Antalya</option><option>Artvin</option><option>Aydın</option><option>Balıkesir</option><option>Bilecik</option><option>Bingöl</option><option>Bitlis</option><option>Bolu</option><option>Burdur</option><option>Bursa</option><option>Çanakkale</option><option>Çankırı</option><option>Çorum</option><option>Denizli</option><option>Diyarbakır</option><option>Edirne</option><option>Elazığ</option><option>Erzincan</option><option>Erzurum</option><option>Eskişehir</option><option>Gaziantep</option><option>Giresun</option><option>Gümüşhane</option><option>Hakkari</option><option>Hatay</option><option>Isparta</option><option>Mersin</option><option>İstanbul</option><option>İzmir</option><option>Kars</option><option>Kastamonu</option><option>Kayseri</option><option>Kırklareli</option><option>Kırşehir</option><option>Kocaeli</option><option>Konya</option><option>Kütahya</option><option>Malatya</option><option>Manisa</option><option>Kahramanmaraş</option><option>Mardin</option><option>Muğla</option><option>Muş</option><option>Nevşehir</option><option>Niğde</option><option>Ordu</option><option>Rize</option><option>Sakarya</option><option>Samsun</option><option>Siirt</option><option>Sinop</option><option>Sivas</option><option>Tekirdağ</option><option>Tokat</option><option>Trabzon</option><option>Tunceli</option><option>Şanlıurfa</option><option>Uşak</option><option>Van</option><option>Yozgat</option><option>Zonguldak</option><option>Aksaray</option><option>Bayburt</option><option>Karaman</option><option>Kırıkkale</option><option>Batman</option><option>Şırnak</option><option>Bartın</option><option>Ardahan</option><option>Iğdır</option><option>Yalova</option><option>Karabük</option><option>Kilis</option><option>Osmaniye</option><option>Düzce</option></select></div>
+      <div class="form-group"><label>İlçe</label><select id="ilce"></select></div>
+      <div class="form-group"><label>Mahalle (Opsiyonel)</label><input type="text" id="mahalle" placeholder="Mahalle adı" oninput="m2HintGuncelle()"></div>
+      <div class="form-group"><label>Cadde/Sokak (Opsiyonel)</label><input type="text" id="cadde" placeholder="Cadde/Sokak"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Yakınlık / Mesafeler (Opsiyonel)</label><input type="text" id="mesafeler" placeholder="ör: Okul 200m, Hastane 1km, Otobüs 100m"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">| Özellikler</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-dogalgaz"> Doğalgaz</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-ankastre"> Ankastre Mutfak</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-ebeveyn"> Ebeveyn Banyosu</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-akilli"> Akıllı Ev Sistemi</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-balkon"> Balkon</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-asansor"> Asansör</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-bahce"> Bahçe</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-guvenlik"> Güvenlik</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-site"> Site İçi</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-otopark"> Otopark</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-havuz"> Havuz</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-deprem"> Deprem Güçlendirmesi</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-spor"> Spor Salonu</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-manzara"> Deniz Manzarası</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="o-teras"> Teras</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">| Sahibinden Piyasa Fiyatları (opsiyonel)</div>
+    <p style="font-size:14px;color:#888;margin-bottom:14px">Bölgedeki emlakçı ilan fiyatlarını girin. Ortalama değerlemeye dahil edilir.</p>
+    <div class="price-input-row">
+      <input type="text" id="fiyatInput" placeholder="" oninput="formatFiyat(this)" onkeydown="if(event.key==='Enter')fiyatEkle()" style="font-size:16px;padding:14px">
+      <button class="add-btn" onclick="fiyatEkle()">+</button>
+    </div>
+    <div class="price-tags" id="fiyatTags"></div>
+    <div class="price-summary" id="fiyatSummary"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">| Ek Bilgiler</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Amaç</label><select id="amac"><option value="">Seçin</option><option>Satılık</option><option>Kiralık</option></select></div>
+      <div class="form-group"><label>Bölgedeki İlan Sayısı (Opsiyonel)</label><input type="number" id="ilanSayisi" placeholder=""></div>
+      <div class="form-group"><label>Aylık Kira (Opsiyonel)</label><input type="text" id="aylikKira" placeholder="" oninput="formatKira(this)"></div>
+    </div>
+    <div class="form-group" style="margin-top:16px"><label>Ek Notlar (Opsiyonel)</label><textarea id="notlar" rows="3" placeholder=""></textarea></div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+  <div class="loading" id="loadingBox">⏳ AI analiz yapıyor, lütfen bekleyin...</div>
+  <button class="submit-btn" onclick="degerlemeyap()">🔍 Değerleme Yap</button>
+</div>
+</div>
+
+<!-- SONUÇ -->
+<div class="result-page" id="resultPage">
+  <div class="result-header">
+    <h1>Murat Öge Gayrimenkul</h1>
+    <p>Emlak Değerleme Raporu</p>
+  </div>
+  <div class="result-body">
+    <div class="price-cards">
+      <div class="price-card hizli">
+        <div class="card-title" id="r-hizli-title">🔵 Hızlı Satış</div>
+        <div class="m2-price" id="r-hizli-m2"></div>
+        <div class="total-price" id="r-hizli-total"></div>
+      </div>
+      <div class="price-card ortalama">
+        <div class="card-title" id="r-ort-title">🟡 Ortalama Satış</div>
+        <div class="m2-price" id="r-ort-m2"></div>
+        <div class="total-price" id="r-ort-total"></div>
+      </div>
+      <div class="price-card tok">
+        <div class="card-title" id="r-tok-title">🔴 TOK Satış</div>
+        <div class="m2-price" id="r-tok-m2"></div>
+        <div class="total-price" id="r-tok-total"></div>
+      </div>
+    </div>
+    <div class="result-section" id="ilanBilgi" style="display:none">
+      <h3>📊 Piyasa Bilgisi</h3>
+      <div class="ilan-info" id="ilanText"></div>
+    </div>
+    <div class="result-section" id="kiraSection" style="display:none">
+      <h3>💰 Kira Analizi</h3>
+      <div class="kira-grid">
+        <div class="kira-item"><div class="ki-label">Aylık Kira</div><div class="ki-value" id="r-kira-aylik"></div></div>
+        <div class="kira-item"><div class="ki-label">Yıllık Gelir</div><div class="ki-value" id="r-kira-yillik"></div></div>
+        <div class="kira-item"><div class="ki-label">Geri Dönüş</div><div class="ki-value" id="r-kira-sure"></div></div>
+        <div class="kira-item"><div class="ki-label">Getiri Oranı</div><div class="ki-value" id="r-kira-getiri"></div></div>
+      </div>
+    </div>
+    <div class="result-section">
+      <h3>📝 AI Analizi</h3>
+      <p id="r-analiz"></p>
+    </div>
+    <div class="result-section">
+      <h3>🏠 Mülk Bilgileri</h3>
+      <p id="r-detay"></p>
+    </div>
+    <div class="result-footer">
+      Değerlemeyi Yapan: <strong id="r-uzman"></strong> | <span id="r-tarih"></span><br>
+      <em>⏱ Bu değerleme raporu düzenlenme tarihinden itibaren 60 gün geçerlidir.</em>
+    </div>
+    <div class="action-btns">
+      <button class="btn-back" onclick="geriDon()">← Yeni Değerleme</button>
+      <button class="btn-pdf" onclick="window.print()">📄 PDF İndir</button>
+      <button class="btn-wa" onclick="whatsappGonder()">📱 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var WEBHOOK = 'https://socks-judge-tutorials-managers.trycloudflare.com/webhook/degerleme-webhook';
+
+var bolgeFiyatlari = JSON.parse(localStorage.getItem('bolgeFiyatlari') || '[]');
+
+function bolgeToggle() {
+  var p = document.getElementById('bolgePanel');
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  if (p.style.display === 'block') renderBolge();
+}
+function formatBolgeM2(el) {
+  var v = el.value.replace(/\D/g,'');
+  if (v) el.value = parseInt(v).toLocaleString('tr-TR');
+  else el.value = '';
+}
+function bolgeEkle() {
+  var ilce = document.getElementById('bolgeIlce').value.trim();
+  var mahalle = document.getElementById('bolgeMahalle').value.trim();
+  var m2raw = document.getElementById('bolgeM2').value.replace(/\./g,'').replace(/,/g,'');
+  var m2 = parseInt(m2raw);
+  if (!ilce || !m2) return;
+  bolgeFiyatlari.push({ilce: ilce, mahalle: mahalle, m2: m2});
+  localStorage.setItem('bolgeFiyatlari', JSON.stringify(bolgeFiyatlari));
+  document.getElementById('bolgeIlce').value = '';
+  document.getElementById('bolgeMahalle').value = '';
+  document.getElementById('bolgeM2').value = '';
+  renderBolge();
+}
+function bolgeSil(i) {
+  bolgeFiyatlari.splice(i,1);
+  localStorage.setItem('bolgeFiyatlari', JSON.stringify(bolgeFiyatlari));
+  renderBolge();
+}
+function renderBolge() {
+  var list = document.getElementById('bolgeList');
+  if (!list) return;
+  list.innerHTML = bolgeFiyatlari.map(function(b,i){
+    return '<div class="bolge-item">'+b.ilce+(b.mahalle?' - '+b.mahalle:'')+' <span>'+b.m2.toLocaleString('tr-TR')+' TL/m²</span><button onclick="bolgeSil('+i+')">×</button></div>';
+  }).join('');
+}
+function getBolgeM2(ilce, mahalle) {
+  for (var i=0; i<bolgeFiyatlari.length; i++) {
+    var b = bolgeFiyatlari[i];
+    if (b.ilce.toLowerCase()===ilce.toLowerCase() && mahalle && b.mahalle.toLowerCase()===mahalle.toLowerCase()) return b.m2;
+  }
+  for (var i=0; i<bolgeFiyatlari.length; i++) {
+    var b = bolgeFiyatlari[i];
+    if (b.ilce.toLowerCase()===ilce.toLowerCase()) return b.m2;
+  }
+  return null;
+}
+function ilceSecildi() {
+  ilceGuncelle();
+  m2HintGuncelle();
+}
+function m2HintGuncelle() {
+  var ilce = document.getElementById('ilce').value;
+  var mahalle = document.getElementById('mahalle').value;
+  var m2 = getBolgeM2(ilce, mahalle);
+  var hint = document.getElementById('m2hint');
+  if (m2 && hint) {
+    hint.style.display = 'block';
+    hint.textContent = '📍 ' + ilce + (mahalle?' - '+mahalle:'') + ' bölge fiyatı: ' + m2.toLocaleString('tr-TR') + ' TL/m²';
+  } else if (hint) {
+    hint.style.display = 'none';
+  }
+}
+var PASS = btoa('Murat19801980*');
+
+function checkPass() {
+  var p = document.getElementById('passInput').value;
+  if (btoa(p) === PASS) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+    sessionStorage.setItem('auth','ok');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+if (sessionStorage.getItem('auth') === 'ok') {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('mainPage').style.display = 'block';
+}
+
+document.getElementById('tarih').value = new Date().toLocaleDateString('tr-TR');
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+var ilceler = {
+  'Kocaeli':['Başiskele','Çayırova','Darıca','Derince','Dilovası','Gebze','Gölcük','İzmit','Kandıra','Karamürsel','Kartepe','Körfez'],
+  'İstanbul':['Adalar','Arnavutköy','Ataşehir','Avcılar','Bağcılar','Bahçelievler','Bakırköy','Başakşehir','Bayrampaşa','Beşiktaş','Beykoz','Beylikdüzü','Beyoğlu','Büyükçekmece','Çatalca','Çekmeköy','Esenler','Esenyurt','Eyüpsultan','Fatih','Gaziosmanpaşa','Güngören','Kadıköy','Kağıthane','Kartal','Küçükçekmece','Maltepe','Pendik','Sancaktepe','Sarıyer','Silivri','Sultanbeyli','Sultangazi','Şile','Şişli','Tuzla','Ümraniye','Üsküdar','Zeytinburnu'],
+  'Ankara':['Altındağ','Ayaş','Bala','Beypazarı','Çamlıdere','Çankaya','Çubuk','Elmadağ','Etimesgut','Evren','Gölbaşı','Güdül','Haymana','Kalecik','Kazan','Keçiören','Kızılcahamam','Mamak','Nallıhan','Polatlı','Pursaklar','Sincan','Şereflikoçhisar','Yenimahalle'],
+  'İzmir':['Aliağa','Balçova','Bayındır','Bayraklı','Bergama','Beydağ','Bornova','Buca','Çeşme','Çiğli','Dikili','Foça','Gaziemir','Güzelbahçe','Karabağlar','Karaburun','Karşıyaka','Kemalpaşa','Kınık','Kiraz','Konak','Menderes','Menemen','Narlıdere','Ödemiş','Seferihisar','Selçuk','Tire','Torbalı','Urla']
+};
+function ilceGuncelle() {
+  var il = document.getElementById('il').value;
+  var sel = document.getElementById('ilce');
+  sel.innerHTML = '';
+  var liste = ilceler[il] || ['Merkez'];
+  liste.forEach(function(i){var o=document.createElement('option');o.value=i;o.textContent=i;sel.appendChild(o);});
+}
+ilceGuncelle();
+
+function formatArsaAlan(el) {
+  var v = el.value.replace(/\D/g,'');
+  if (v) el.value = parseInt(v).toLocaleString('tr-TR');
+  else el.value = '';
+}
+
+var fiyatlar = [];
+function formatFiyat(el) {
+  var v = el.value.replace(/\D/g,'');
+  if (v) el.value = parseInt(v).toLocaleString('tr-TR');
+  else el.value = '';
+}
+function formatKira(el) {
+  var v = el.value.replace(/\D/g,'');
+  if (v) el.value = parseInt(v).toLocaleString('tr-TR');
+  else el.value = '';
+}
+function fiyatEkle() {
+  var raw = document.getElementById('fiyatInput').value.replace(/\./g,'').replace(/,/g,'');
+  if (!raw || isNaN(raw)) return;
+  fiyatlar.push(parseInt(raw));
+  document.getElementById('fiyatInput').value = '';
+  renderFiyatlar();
+}
+function fiyatSil(i) { fiyatlar.splice(i,1); renderFiyatlar(); }
+function renderFiyatlar() {
+  var tags = document.getElementById('fiyatTags');
+  var sum = document.getElementById('fiyatSummary');
+  tags.innerHTML = fiyatlar.map(function(f,i){
+    return '<div class="price-tag">'+f.toLocaleString('tr-TR')+' TL <button onclick="fiyatSil('+i+')">×</button></div>';
+  }).join('');
+  if (fiyatlar.length > 0) {
+    var ort = Math.round(fiyatlar.reduce(function(a,b){return a+b},0)/fiyatlar.length);
+    sum.innerHTML = fiyatlar.length+' ilan — Ortalama: <span>'+ort.toLocaleString('tr-TR')+' TL</span>';
+  } else { sum.innerHTML = ''; }
+}
+
+function parseNum(str) {
+  if (!str) return null;
+  var clean = String(str).replace(/\./g,'').replace(/,/g,'').replace(/\s/g,'');
+  var n = parseInt(clean);
+  return isNaN(n) ? null : n;
+}
+
+function extractPrices(data) {
+  var result = {hMin:null,hMax:null,oMin:null,oMax:null,tMin:null,tMax:null,analiz:''};
+  if (data.hMin) result.hMin = parseNum(data.hMin);
+  if (data.hMax) result.hMax = parseNum(data.hMax);
+  if (data.oMin) result.oMin = parseNum(data.oMin);
+  if (data.oMax) result.oMax = parseNum(data.oMax);
+  if (data.tMin) result.tMin = parseNum(data.tMin);
+  if (data.tMax) result.tMax = parseNum(data.tMax);
+  if (data.analiz) result.analiz = data.analiz;
+  var txt = data.analiz || JSON.stringify(data);
+  function findVal(key) {
+    var re = new RegExp(key+'[:\\s]+([\\d][\\d\\.\\,]+)', 'i');
+    var m = txt.match(re);
+    return m ? parseNum(m[1]) : null;
+  }
+  if (!result.hMin) result.hMin = findVal('HIZLI_MIN');
+  if (!result.hMax) result.hMax = findVal('HIZLI_MAX');
+  if (!result.oMin) result.oMin = findVal('ORT_MIN');
+  if (!result.oMax) result.oMax = findVal('ORT_MAX');
+  if (!result.tMin) result.tMin = findVal('TOK_MIN');
+  if (!result.tMax) result.tMax = findVal('TOK_MAX');
+  var analizMatch = txt.match(/ANALIZ[:\s]+([\s\S]+)/i);
+  if (analizMatch) result.analiz = analizMatch[1].trim();
+  return result;
+}
+
+async function degerlemeyap() {
+  var btn = document.querySelector('.submit-btn');
+  var err = document.getElementById('errorBox');
+  var load = document.getElementById('loadingBox');
+  err.style.display = 'none';
+  load.style.display = 'block';
+  btn.disabled = true;
+
+  var aktifTab = document.querySelector('.tab.active').textContent.trim();
+  function parseM2(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value) return 0;
+    return parseInt(el.value.replace(/\./g,'').replace(/,/g,'')) || 0;
+  }
+  var brut = parseM2('konut-brut') || parseM2('arsa-alan') || parseM2('ticari-brut') || 0;
+  var amac = document.getElementById('amac').value;
+  var ilanSayisi = document.getElementById('ilanSayisi').value;
+  var kiraRaw = document.getElementById('aylikKira').value.replace(/\./g,'').replace(/,/g,'');
+  var aylikKira = kiraRaw ? parseInt(kiraRaw) : 0;
+  var ortalama = fiyatlar.length > 0 ? Math.round(fiyatlar.reduce(function(a,b){return a+b},0)/fiyatlar.length) : 0;
+
+  var ozellikler = [];
+  ['dogalgaz','ankastre','ebeveyn','akilli','balkon','asansor','bahce','guvenlik','site','otopark','havuz','deprem','spor','manzara','teras'].forEach(function(o){
+    if (document.getElementById('o-'+o).checked) ozellikler.push(o);
+  });
+
+  var veri = {
+    tip: aktifTab,
+    il: document.getElementById('il').value,
+    ilce: document.getElementById('ilce').value,
+    mahalle: document.getElementById('mahalle').value,
+    brutM2: brut,
+    amac: amac,
+    ilanSayisi: ilanSayisi || '',
+    aylikKira: aylikKira,
+    notlar: document.getElementById('notlar').value,
+    ozellikler: ozellikler.join(', '),
+    sahibindenOrtalama: ortalama,
+    sahibindenSayisi: fiyatlar.length,
+    bolgeM2: getBolgeM2(document.getElementById('ilce').value, document.getElementById('mahalle').value) || 0,
+    mesafeler: document.getElementById('mesafeler').value,
+    konut: aktifTab.includes('Konut') ? {
+      tip: document.getElementById('konut-tip').value,
+      oda: document.getElementById('konut-oda').value,
+      kat: document.getElementById('konut-kat').value,
+      topKat: document.getElementById('konut-topkat').value,
+      yas: document.getElementById('konut-yas').value,
+      isitma: document.getElementById('konut-isitma').value
+    } : null
+  };
+
+  try {
+    var res = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(veri)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    load.style.display = 'none';
+    btn.disabled = false;
+    sonucGoster(data, veri);
+  } catch(e) {
+    load.style.display = 'none';
+    btn.disabled = false;
+    err.style.display = 'block';
+    err.textContent = 'Hata: ' + e.message;
+  }
+}
+
+function sonucGoster(rawData, v) {
+  var d = extractPrices(rawData);
+  document.getElementById('mainPage').style.display = 'none';
+  var rp = document.getElementById('resultPage');
+  rp.style.display = 'block';
+
+  var brut = v.brutM2 || 1;
+  var kirali = v.amac === 'Kiralık';
+  function m2Fmt(total) {
+    if (!total) return '-';
+    return Math.round(total/brut).toLocaleString('tr-TR')+' TL/m²';
+  }
+  function tlFmt(n) { return n ? n.toLocaleString('tr-TR')+' TL' : '-'; }
+  function rangeStr(mn, mx) {
+    if (!mn && !mx) return '-';
+    if (mn && mx) return tlFmt(mn)+' — '+tlFmt(mx);
+    return tlFmt(mn || mx);
+  }
+
+  document.getElementById('r-hizli-title').textContent = kirali ? '🔵 Hızlı Kiralama' : '🔵 Hızlı Satış';
+  document.getElementById('r-ort-title').textContent = kirali ? '🟡 Ortalama Kiralama' : '🟡 Ortalama Satış';
+  document.getElementById('r-tok-title').textContent = kirali ? '🔴 Yüksek Kiralama' : '🔴 TOK Satış';
+
+  document.getElementById('r-hizli-m2').textContent = m2Fmt(d.hMin);
+  document.getElementById('r-hizli-total').textContent = rangeStr(d.hMin, d.hMax);
+  document.getElementById('r-ort-m2').textContent = m2Fmt(d.oMin);
+  document.getElementById('r-ort-total').textContent = rangeStr(d.oMin, d.oMax);
+  document.getElementById('r-tok-m2').textContent = m2Fmt(d.tMin);
+  document.getElementById('r-tok-total').textContent = rangeStr(d.tMin, d.tMax);
+
+  var analizTemiz = (d.analiz || '').replace(/\b(\d{4,})\b/g, function(m) {
+    return parseInt(m).toLocaleString('tr-TR');
+  });
+  document.getElementById('r-analiz').textContent = analizTemiz;
+
+  var tipEmoji = v.tip.includes('Konut') ? '🏠' : v.tip.includes('Arsa') ? '🌍' : '🏢';
+  var tipDetay = v.konut ? (v.konut.oda ? v.konut.oda+' | ' : '') : '';
+  var detay = v.il+' / '+v.ilce+(v.mahalle?' / '+v.mahalle:'')+' | '+tipEmoji+' '+v.tip+' | '+tipDetay+v.brutM2+'m²';
+  document.getElementById('r-detay').textContent = detay;
+  document.getElementById('r-uzman').textContent = document.getElementById('adSoyad').value;
+  document.getElementById('r-tarih').textContent = document.getElementById('tarih').value;
+
+  if (v.ilanSayisi) {
+    document.getElementById('ilanBilgi').style.display = 'block';
+    document.getElementById('ilanText').textContent = 'Bu bölgede '+v.ilanSayisi+' adet '+v.amac.toLowerCase()+' ilan bulunmaktadır.';
+  }
+
+  // Kira analizi: sadece aylikKira girilmişse VE Arsa değilse göster
+  var arsaMi = v.tip.includes('Arsa');
+  if (v.aylikKira && v.aylikKira > 0 && !arsaMi) {
+    document.getElementById('kiraSection').style.display = 'block';
+    var yillik = v.aylikKira * 12;
+    document.getElementById('r-kira-aylik').textContent = v.aylikKira.toLocaleString('tr-TR')+' TL';
+    document.getElementById('r-kira-yillik').textContent = yillik.toLocaleString('tr-TR')+' TL';
+    if (!kirali) {
+      // Satılık: satış fiyatından geri dönüş hesapla
+      var ortFiyat = (d.oMin && d.oMax) ? Math.round((d.oMin+d.oMax)/2) : (d.oMin || d.oMax || 0);
+      var sure = (ortFiyat && yillik) ? Math.round(ortFiyat/yillik) : 0;
+      var getiri = (ortFiyat && yillik) ? ((yillik/ortFiyat)*100).toFixed(1) : 0;
+      document.getElementById('r-kira-sure').textContent = sure ? sure+' yıl' : '-';
+      document.getElementById('r-kira-getiri').textContent = getiri ? '%'+getiri : '-';
+    } else {
+      // Kiralık: geri dönüş hesaplanamaz
+      document.getElementById('r-kira-sure').textContent = '-';
+      document.getElementById('r-kira-getiri').textContent = '-';
+    }
+  } else {
+    document.getElementById('kiraSection').style.display = 'none';
+  }
+}
+
+function geriDon() {
+  document.getElementById('resultPage').style.display = 'none';
+  document.getElementById('mainPage').style.display = 'block';
+}
+
+function whatsappGonder() {
+  var txt = 'Emlak Değerleme Raporu - Murat Öge Gayrimenkul';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt));
+}
+</script>
+</body>
+</html>
