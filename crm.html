@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murat Gayrimenkul CRM</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
+.container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+.crm-baslik { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.crm-baslik h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+.crm-altyazi { font-size: 13px; color: #888; }
+.istatistikler { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.istatistik { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #e8e8e8; }
+.istatistik-etiket { font-size: 12px; color: #888; margin-bottom: 4px; }
+.stat-val { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+.filtreler { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+.filtre-dugmesi { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer; }
+.filtre-dugmesi.aktif { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+.arama-kutusu { flex: 1; min-width: 160px; font-size: 13px; padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; outline: none; }
+.arama-kutusu:focus { border-color: #1a73e8; }
+.btn-ekle { font-size: 13px; padding: 6px 16px; border-radius: 20px; border: none; background: #1a73e8; color: #fff; cursor: pointer; font-weight: 500; }
+.btn-ekle:hover { background: #1557b0; }
+.lider-listesi { display: flex; flex-direction: column; gap: 8px; }
+.kurşun-kart { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 12px 16px; cursor: pointer; transition: border-color 0.15s; }
+.kurşun-kart:hover { border-color: #bbb; }
+.kurşun-kart.genisletilmis { border-color: #1a73e8; }
+.kurşun-üstü { display: flex; align-items: center; }
+.kurşun-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e8f0fe; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
+.öncü-bilgi { flex: 1; min-width: 0; }
+.baş-isim { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+.kurşun-telefon { font-size: 12px; color: #888; }
+.kurşun-meta { display: flex; align-items: center; gap: 6px; }
+.rozet { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 500; }
+.rozet-yeni { background: #e8f0fe; color: #1a73e8; }
+.rozet-arandi { background: #fef3e2; color: #f59c00; }
+.rozet-randevu { background: #e6f4ea; color: #1e8e3e; }
+.rozet-kapandi { background: #f1f3f4; color: #666; }
+.tarih-metni { font-size: 11px; color: #aaa; }
+.kurşun-detay { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+.detay-satir { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+.detay-satir label { font-size: 12px; color: #888; width: 80px; }
+.detay-satir select, .detay-satir input, .detay-satir textarea { font-size: 13px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 6px; flex: 1; min-width: 0; outline: none; }
+.detay-satir textarea { resize: vertical; min-height: 60px; }
+.detay-butonlar { display: flex; gap: 8px; margin-top: 8px; }
+.btn-kaydet { font-size: 13px; padding: 6px 16px; border-radius: 8px; border: none; background: #1a73e8; color: #fff; cursor: pointer; }
+.btn-iptal { font-size: 13px; padding: 6px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer; }
+.modal-arkaplan { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+.modal-arkaplan.acik { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 24px; width: 100%; max-width: 420px; margin: 1rem; }
+.modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.form-satir { margin-bottom: 12px; }
+.form-satir label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
+.form-satir input, .form-satir select, .form-satir textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+.form-satir input:focus, .form-satir select:focus { border-color: #1a73e8; }
+.modal-butonlar { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.hata-mesaj { background: #fce8e6; color: #c5221f; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+.yuklen-mesaj { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="crm-baslik">
+    <div>
+      <h1>Murat Gayrimenkul CRM</h1>
+      <div class="crm-altyazi">Lead yönetim paneli</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-ekle" onclick="modalAc()">+ Yeni Lead</button>
+      <button class="filtre-dugmesi" onclick="yukle()">↻ Yenile</button>
+    </div>
+  </div>
+
+  <div class="istatistikler">
+    <div class="istatistik"><div class="istatistik-etiket">Toplam Lead</div><div class="stat-val" id="stat-toplam">—</div></div>
+    <div class="istatistik"><div class="istatistik-etiket">Yeni</div><div class="stat-val" id="stat-yeni">—</div></div>
+    <div class="istatistik"><div class="istatistik-etiket">Randevu</div><div class="stat-val" id="stat-randevu">—</div></div>
+    <div class="istatistik"><div class="istatistik-etiket">Kapandı</div><div class="stat-val" id="stat-kapandi">—</div></div>
+  </div>
+
+  <div class="filtreler">
+    <button class="filtre-dugmesi aktif" onclick="filtrele('Tümü', this)">Tümü</button>
+    <button class="filtre-dugmesi" onclick="filtrele('Yeni', this)">Yeni</button>
+    <button class="filtre-dugmesi" onclick="filtrele('Arandı', this)">Arandı</button>
+    <button class="filtre-dugmesi" onclick="filtrele('Randevu', this)">Randevu</button>
+    <button class="filtre-dugmesi" onclick="filtrele('Kapandı', this)">Kapandı</button>
+    <input class="arama-kutusu" type="text" placeholder="Telefon, isim veya ilçe ara..." oninput="ara(this.value)">
+  </div>
+
+  <div id="lead-listesi" class="lider-listesi">
+    <div class="yuklen-mesaj">Yükleniyor...</div>
+  </div>
+</div>
+
+<!-- Yeni Lead Modal -->
+<div class="modal-arkaplan" id="modal">
+  <div class="modal">
+    <h3>Yeni Lead Ekle</h3>
+    <div id="modal-hata"></div>
+    <div class="form-satir"><label>Ad Soyad</label><input id="f-ad" type="text" placeholder="Ad Soyad"></div>
+    <div class="form-satir"><label>Telefon</label><input id="f-tel" type="text" placeholder="05XX XXX XXXX"></div>
+    <div class="form-satir"><label>İlçe</label><input id="f-ilce" type="text" placeholder="Derince, Gebze..."></div>
+    <div class="form-satir"><label>Mülk Tipi</label>
+      <select id="f-mulk">
+        <option>Konut</option>
+        <option>Arsa</option>
+        <option>Plaza/Ticari</option>
+      </select>
+    </div>
+    <div class="form-satir"><label>Not</label><textarea id="f-notlar" placeholder="Notlar..."></textarea></div>
+    <div class="modal-butonlar">
+      <button class="btn-iptal" onclick="modalKapat()">İptal</button>
+      <button class="btn-kaydet" onclick="leadEkle()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://92.5.30.112:5678/webhook/crm-api';
+let tumLeadler = [];
+let aktifFiltre = 'Tümü';
+let aramaMetni = '';
+
+async function yukle() {
+  document.getElementById('lead-listesi').innerHTML = '<div class="yuklen-mesaj">Yükleniyor...</div>';
+  try {
+    const res = await fetch(API, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    tumLeadler = Array.isArray(data) ? data : (data.leads || []);
+    istatistikGuncelle();
+    listeyiGoster();
+  } catch (e) {
+    document.getElementById('lead-listesi').innerHTML = '<div class="hata-mesaj">Veri yüklenemedi: ' + e.message + '</div>';
+  }
+}
+
+function istatistikGuncelle() {
+  document.getElementById('stat-toplam').textContent = tumLeadler.length;
+  document.getElementById('stat-yeni').textContent = tumLeadler.filter(l => l.durum === 'Yeni').length;
+  document.getElementById('stat-randevu').textContent = tumLeadler.filter(l => l.durum === 'Randevu').length;
+  document.getElementById('stat-kapandi').textContent = tumLeadler.filter(l => l.durum === 'Kapandı').length;
+}
+
+function listeyiGoster() {
+  let liste = tumLeadler;
+  if (aktifFiltre !== 'Tümü') liste = liste.filter(l => l.durum === aktifFiltre);
+  if (aramaMetni) {
+    const s = aramaMetni.toLowerCase();
+    liste = liste.filter(l => (l.ad||'').toLowerCase().includes(s) || (l.telefon||'').includes(s) || (l.ilce||'').toLowerCase().includes(s));
+  }
+  if (liste.length === 0) {
+    document.getElementById('lead-listesi').innerHTML = '<div class="yuklen-mesaj">Lead bulunamadı.</div>';
+    return;
+  }
+  document.getElementById('lead-listesi').innerHTML = liste.map(l => kartHTML(l)).join('');
+}
+
+function kartHTML(l) {
+  const isim = l.ad || 'Bilinmiyor';
+  const harf = isim[0] || '?';
+  const tarih = l.created_at ? new Date(l.created_at).toLocaleDateString('tr-TR') : '';
+  const rozetSinif = { 'Yeni': 'rozet-yeni', 'Arandı': 'rozet-arandi', 'Randevu': 'rozet-randevu', 'Kapandı': 'rozet-kapandi' }[l.durum] || 'rozet-yeni';
+  return `<div class="kurşun-kart" id="kart-${l.id}">
+    <div class="kurşun-üstü" onclick="toggleDetay(${l.id})">
+      <div class="kurşun-avatar" style="margin-right:12px">${harf}</div>
+      <div class="öncü-bilgi">
+        <div class="baş-isim">${isim}</div>
+        <div class="kurşun-telefon">${l.telefon || '—'} ${l.ilce ? '· ' + l.ilce : ''} ${l.mulk_tipi ? '· ' + l.mulk_tipi : ''}</div>
+      </div>
+      <div class="kurşun-meta">
+        <span class="rozet ${rozetSinif}">${l.durum || 'Yeni'}</span>
+        <span class="tarih-metni">${tarih}</span>
+      </div>
+    </div>
+    <div class="kurşun-detay" id="detay-${l.id}" style="display:none">
+      <div class="detay-satir">
+        <label>Durum</label>
+        <select id="durum-${l.id}">
+          <option ${l.durum==='Yeni'?'selected':''}>Yeni</option>
+          <option ${l.durum==='Arandı'?'selected':''}>Arandı</option>
+          <option ${l.durum==='Randevu'?'selected':''}>Randevu</option>
+          <option ${l.durum==='Kapandı'?'selected':''}>Kapandı</option>
+        </select>
+      </div>
+      <div class="detay-satir">
+        <label>Not</label>
+        <textarea id="notlar-${l.id}">${l.notlar || ''}</textarea>
+      </div>
+      <div class="detay-butonlar">
+        <button class="btn-kaydet" onclick="guncelle(${l.id})">Kaydet</button>
+        <button class="btn-iptal" onclick="toggleDetay(${l.id})">Kapat</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleDetay(id) {
+  const detay = document.getElementById('detay-' + id);
+  const kart = document.getElementById('kart-' + id);
+  if (detay.style.display === 'none') {
+    detay.style.display = 'block';
+    kart.classList.add('genisletilmis');
+  } else {
+    detay.style.display = 'none';
+    kart.classList.remove('genisletilmis');
+  }
+}
+
+function filtrele(filtre, el) {
+  aktifFiltre = filtre;
+  document.querySelectorAll('.filtre-dugmesi').forEach(b => b.classList.remove('aktif'));
+  el.classList.add('aktif');
+  listeyiGoster();
+}
+
+function ara(deger) {
+  aramaMetni = deger;
+  listeyiGoster();
+}
+
+function modalAc() {
+  document.getElementById('modal').classList.add('acik');
+  document.getElementById('modal-hata').innerHTML = '';
+}
+
+function modalKapat() {
+  document.getElementById('modal').classList.remove('acik');
+  ['f-ad','f-tel','f-ilce','f-notlar'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-mulk').selectedIndex = 0;
+}
+
+async function leadEkle() {
+  const ad = document.getElementById('f-ad').value.trim();
+  const telefon = document.getElementById('f-tel').value.trim();
+  if (!ad || !telefon) {
+    document.getElementById('modal-hata').innerHTML = '<div class="hata-mesaj">Ad ve telefon zorunludur.</div>';
+    return;
+  }
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ad, telefon,
+        ilce: document.getElementById('f-ilce').value.trim(),
+        mulk_tipi: document.getElementById('f-mulk').value,
+        notlar: document.getElementById('f-notlar').value.trim()
+      })
+    });
+    if (res.ok) {
+      modalKapat();
+      yukle();
+    } else {
+      document.getElementById('modal-hata').innerHTML = '<div class="hata-mesaj">Kayıt hatası.</div>';
+    }
+  } catch (e) {
+    document.getElementById('modal-hata').innerHTML = '<div class="hata-mesaj">Bağlantı hatası: ' + e.message + '</div>';
+  }
+}
+
+async function guncelle(id) {
+  const durum = document.getElementById('durum-' + id).value;
+  const notlar = document.getElementById('notlar-' + id).value;
+  try {
+    await fetch(API, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, durum, notlar })
+    });
+    yukle();
+  } catch (e) {
+    alert('Güncelleme hatası: ' + e.message);
+  }
+}
+
+yukle();
+</script>
+</body>
+</html>
